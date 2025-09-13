@@ -1,0 +1,6 @@
+# requirements.txt - MINIMAL WORKING SET
+streamlit==1.28.0
+openai-whisper
+anthropic==0.7.8
+torch
+torchaudio

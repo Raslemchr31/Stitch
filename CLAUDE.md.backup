@@ -1,0 +1,116 @@
+# Meta Ads Intelligence Platform - Claude Code Memory
+
+## Project Architecture & Standards
+
+### Technology Stack
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js
+- **Deployment**: Docker containerization
+- **API Integration**: Meta Marketing API, Facebook Graph API
+
+### Build & Development Commands
+```bash
+# Development
+npm run dev              # Start development server
+npm run build           # Production build
+npm run start          # Start production server
+npm run typecheck      # TypeScript checking
+npm run lint           # ESLint checking
+
+# Database
+npx prisma generate    # Generate Prisma client
+npx prisma db push     # Push schema changes
+npx prisma studio      # Open Prisma Studio
+
+# Testing
+npm run test           # Run tests
+npm run test:e2e       # End-to-end tests
+
+# Docker
+docker build -t meta-ads-platform .
+docker-compose up -d
+```
+
+### API Architecture
+- RESTful APIs in `/src/app/api/`
+- Authentication endpoints: `/api/auth/[...nextauth]`
+- Meta API integration: `/api/meta/`
+- Webhook handlers: `/api/webhooks/`
+- Health checks: `/api/health/`
+
+### Database Schema Patterns
+```prisma
+// User management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  accounts  Account[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Meta Ad Account integration
+model AdAccount {
+  id            String @id
+  name          String
+  accountId     String
+  accessToken   String
+  userId        String
+  user          User   @relation(fields: [userId], references: [id])
+}
+```
+
+### Component Architecture
+- Page components in `/src/app/`
+- Reusable components in `/src/components/`
+- UI primitives in `/src/components/ui/`
+- Layout components in `/src/components/layout/`
+- Feature-specific components organized by domain
+
+### State Management
+- Server state with React Query/TanStack Query
+- Client state with Zustand for complex state
+- Form state with React Hook Form + Zod validation
+- Authentication state through NextAuth session
+
+### Environment Configuration
+```env
+# Database
+DATABASE_URL="postgresql://..."
+
+# NextAuth
+NEXTAUTH_SECRET="..."
+NEXTAUTH_URL="http://localhost:3000"
+
+# Meta API
+META_APP_ID="..."
+META_APP_SECRET="..."
+META_VERIFY_TOKEN="..."
+
+# Production
+NODE_ENV="production"
+```
+
+### Error Handling Patterns
+- API error responses with proper HTTP status codes
+- Client-side error boundaries for component failures
+- Logging with structured data for monitoring
+- Graceful fallbacks for failed API calls
+
+### Security Implementation
+- CSRF protection through NextAuth
+- Rate limiting on API endpoints
+- Input validation with Zod schemas
+- Secure headers configuration
+- Environment variable validation
+
+### Deployment Configuration
+- Multi-stage Docker builds for optimization
+- Nginx reverse proxy configuration
+- Health check endpoints for monitoring
+- Container orchestration with docker-compose
+- Production environment variable management

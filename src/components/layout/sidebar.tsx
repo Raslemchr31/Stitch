@@ -22,7 +22,7 @@ import {
   Database,
   Bell,
   HelpCircle,
-, FileText} from 'lucide-react'
+  FileText} from 'lucide-react'
 
 interface SidebarProps {
   open: boolean

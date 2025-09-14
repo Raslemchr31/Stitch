@@ -357,7 +357,7 @@ class Logger {
   }
 
   // Health check logging
-  logHealthCheck(service: string, status: 'healthy' | 'unhealthy', details?: any): void {
+  logHealthCheck(service: string, status: 'healthy' | 'unhealthy' | 'degraded', details?: any): void {
     const message = `Health Check: ${service} is ${status}`
     const healthContext = {
       service,

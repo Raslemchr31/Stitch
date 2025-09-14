@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
     // Fetch from Meta Graph API
     logger.logMetaApiCall('/me/adaccounts', 'GET')
     const accountsResponse = await metaGraphApiClient.getAdAccounts()
-    
+
     if (!accountsResponse.data) {
       throw new Error('No accounts data received from Meta API')
     }
 
     // Process and store account data
-    const accounts = accountsResponse.data
+    const accounts = accountsResponse.data as any[]
     const processedAccounts = []
 
     for (const account of accounts) {

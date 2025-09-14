@@ -154,7 +154,7 @@ export default function AnalyticsPage() {
       trend: 'up',
       icon: Target,
       description: 'vs last period'
-    },
+    }
   ]
 
   return (
@@ -502,6 +502,7 @@ export default function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

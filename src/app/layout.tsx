@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
 
-const inter = Inter({ 
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-space-grotesk',
 })
 
 export const metadata: Metadata = {
@@ -36,8 +36,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#1877F2' },
-    { media: '(prefers-color-scheme: dark)', color: '#166FE5' },
+    { media: '(prefers-color-scheme: light)', color: '#8013ec' },
+    { media: '(prefers-color-scheme: dark)', color: '#8013ec' },
   ],
 }
 
@@ -53,7 +53,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${spaceGrotesk.variable} font-sans antialiased`}>
         <Providers>
           {children}
           <Toaster 

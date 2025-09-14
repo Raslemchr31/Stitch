@@ -7,11 +7,15 @@ import { cn } from '@/lib/utils'
 
 const routeNames: Record<string, string> = {
   dashboard: 'Dashboard',
+  'campaign-wizard': 'Campaign Wizard',
+  'team-board': 'Team Board',
+  'creative-hub': 'Creative Hub',
+  'ai-optimization': 'AI Optimization',
   pages: 'Pages Management',
   campaigns: 'Campaigns',
   create: 'Create Campaign',
   templates: 'Templates',
-  analytics: 'Analytics',
+  analytics: 'Analytics & Reports',
   performance: 'Performance',
   audience: 'Audience',
   reports: 'Reports',

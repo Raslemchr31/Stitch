@@ -1,0 +1,456 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts'
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Target,
+  DollarSign,
+  Eye,
+  MousePointer,
+  ShoppingCart,
+  Calendar,
+  Download,
+  Filter,
+  RefreshCw,
+  MoreHorizontal,
+  ArrowUpRight,
+  ArrowDownRight
+} from 'lucide-react'
+
+// Sample data for charts
+const performanceData = [
+  { date: '2024-01-01', impressions: 12500, clicks: 450, conversions: 23, spend: 285 },
+  { date: '2024-01-02', impressions: 13200, clicks: 520, conversions: 31, spend: 312 },
+  { date: '2024-01-03', impressions: 11800, clicks: 380, conversions: 19, spend: 268 },
+  { date: '2024-01-04', impressions: 14100, clicks: 580, conversions: 35, spend: 345 },
+  { date: '2024-01-05', impressions: 15300, clicks: 650, conversions: 42, spend: 389 },
+  { date: '2024-01-06', impressions: 13900, clicks: 490, conversions: 28, spend: 298 },
+  { date: '2024-01-07', impressions: 16200, clicks: 720, conversions: 48, spend: 425 },
+]
+
+const audienceData = [
+  { name: '18-24', value: 25, color: '#8013ec' },
+  { name: '25-34', value: 35, color: '#a855f7' },
+  { name: '35-44', value: 22, color: '#c084fc' },
+  { name: '45-54', value: 12, color: '#ddd6fe' },
+  { name: '55+', value: 6, color: '#f3f4f6' }
+]
+
+const campaignData = [
+  { campaign: 'Summer Sale 2024', impressions: 45200, clicks: 1823, conversions: 127, spend: 1250, roas: 4.2 },
+  { campaign: 'Brand Awareness Q1', impressions: 67800, clicks: 1245, conversions: 89, spend: 980, roas: 3.1 },
+  { campaign: 'Product Launch', impressions: 23400, clicks: 891, conversions: 156, spend: 2100, roas: 5.8 },
+  { campaign: 'Retargeting Campaign', impressions: 15600, clicks: 567, conversions: 78, spend: 450, roas: 6.2 },
+  { campaign: 'Holiday Special', impressions: 89300, clicks: 2134, conversions: 289, spend: 1890, roas: 3.9 }
+]
+
+const cohortData = [
+  { period: 'Week 1', newUsers: 1245, returning: 0, revenue: 2456, retention: 100 },
+  { period: 'Week 2', newUsers: 1320, returning: 456, revenue: 3234, retention: 36.7 },
+  { period: 'Week 3', newUsers: 1156, returning: 289, revenue: 2890, retention: 23.2 },
+  { period: 'Week 4', newUsers: 1398, returning: 234, revenue: 3456, retention: 16.8 },
+  { period: 'Week 5', newUsers: 1289, returning: 198, revenue: 2987, retention: 15.4 },
+]
+
+export default function AnalyticsPage() {
+  const [dateRange, setDateRange] = useState('7days')
+  const [selectedMetric, setSelectedMetric] = useState('revenue')
+
+  const kpis = [
+    {
+      title: 'Total Revenue',
+      value: '$24,580',
+      change: '+12.5%',
+      trend: 'up',
+      icon: DollarSign,
+      description: 'vs last period'
+    },
+    {
+      title: 'Total Impressions',
+      value: '2.4M',
+      change: '+8.2%',
+      trend: 'up',
+      icon: Eye,
+      description: 'vs last period'
+    },
+    {
+      title: 'Click-Through Rate',
+      value: '3.42%',
+      change: '-0.8%',
+      trend: 'down',
+      icon: MousePointer,
+      description: 'vs last period'
+    },
+    {
+      title: 'Conversion Rate',
+      value: '2.1%',
+      change: '+15.3%',
+      trend: 'up',
+      icon: Target,
+      description: 'vs last period'
+    },
+    {
+      title: 'Cost Per Click',
+      value: '$0.68',
+      change: '-5.2%',
+      trend: 'up',
+      icon: TrendingDown,
+      description: 'vs last period'
+    },
+    {
+      title: 'Return on Ad Spend',
+      value: '4.2x',
+      change: '+18.7%',
+      trend: 'up',
+      icon: TrendingUp,
+      description: 'vs last period'
+    },
+  ]
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Analytics & Reports</h1>
+          <p className="text-muted-foreground">
+            Comprehensive insights into your campaign performance
+          </p>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-40">
+              <Calendar className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7days">Last 7 days</SelectItem>
+              <SelectItem value="30days">Last 30 days</SelectItem>
+              <SelectItem value="90days">Last 90 days</SelectItem>
+              <SelectItem value="1year">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+
+          <Button variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+
+          <Button size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {kpis.map((kpi, index) => {
+          const Icon = kpi.icon
+          return (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                  <Badge
+                    variant={kpi.trend === 'up' ? 'default' : 'secondary'}
+                    className={`text-xs ${
+                      kpi.trend === 'up'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                    }`}
+                  >
+                    {kpi.trend === 'up' ? (
+                      <ArrowUpRight className="h-3 w-3 mr-1" />
+                    ) : (
+                      <ArrowDownRight className="h-3 w-3 mr-1" />
+                    )}
+                    {kpi.change}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold">{kpi.value}</p>
+                  <p className="text-xs text-muted-foreground">{kpi.title}</p>
+                  <p className="text-xs text-muted-foreground">{kpi.description}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* Main Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Performance Trend */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              Performance Trend
+              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="revenue">Revenue</SelectItem>
+                  <SelectItem value="impressions">Impressions</SelectItem>
+                  <SelectItem value="clicks">Clicks</SelectItem>
+                  <SelectItem value="conversions">Conversions</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={performanceData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8013ec" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#8013ec" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                    formatter={(value: number, name: string) => [
+                      selectedMetric === 'spend' ? `$${value}` : value.toLocaleString(),
+                      name
+                    ]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey={selectedMetric === 'revenue' ? 'spend' : selectedMetric}
+                    stroke="#8013ec"
+                    fillOpacity={1}
+                    fill="url(#colorRevenue)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Audience Demographics */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Audience Demographics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={audienceData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {audienceData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => `${value}%`} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Campaign Performance Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            Campaign Performance
+            <div className="flex items-center space-x-2">
+              <Input
+                placeholder="Search campaigns..."
+                className="w-64"
+              />
+              <Button variant="outline" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead className="text-right">Impressions</TableHead>
+                  <TableHead className="text-right">Clicks</TableHead>
+                  <TableHead className="text-right">Conversions</TableHead>
+                  <TableHead className="text-right">Spend</TableHead>
+                  <TableHead className="text-right">ROAS</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {campaignData.map((campaign, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{campaign.campaign}</TableCell>
+                    <TableCell className="text-right">
+                      {campaign.impressions.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {campaign.clicks.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {campaign.conversions}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      ${campaign.spend.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Badge
+                        variant={campaign.roas >= 4 ? 'default' : 'secondary'}
+                        className={campaign.roas >= 4 ? 'bg-green-100 text-green-700' : ''}
+                      >
+                        {campaign.roas}x
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cohort Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Cohort Analysis</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            User retention and revenue patterns over time
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Period</TableHead>
+                  <TableHead className="text-right">New Users</TableHead>
+                  <TableHead className="text-right">Returning Users</TableHead>
+                  <TableHead className="text-right">Revenue</TableHead>
+                  <TableHead className="text-right">Retention Rate</TableHead>
+                  <TableHead className="text-right">Trend</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cohortData.map((cohort, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{cohort.period}</TableCell>
+                    <TableCell className="text-right">
+                      {cohort.newUsers.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {cohort.returning.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      ${cohort.revenue.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <div className="w-16 bg-muted rounded-full h-2">
+                          <div
+                            className="bg-primary h-2 rounded-full"
+                            style={{ width: `${cohort.retention}%` }}
+                          />
+                        </div>
+                        <span className="text-sm">{cohort.retention}%</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="h-8 w-16">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={[
+                            { value: Math.random() * 100 },
+                            { value: Math.random() * 100 },
+                            { value: Math.random() * 100 },
+                            { value: Math.random() * 100 },
+                          ]}>
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#8013ec"
+                              strokeWidth={2}
+                              dot={false}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

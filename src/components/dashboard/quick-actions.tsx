@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { CreateCampaignModal } from './create-campaign-modal'
 import {
   PlusCircle,
   Target,
@@ -81,6 +82,36 @@ export function QuickActions() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickActions.map((action) => {
             const Icon = action.icon
+
+            // Special handling for Create Campaign action
+            if (action.title === 'Create Campaign') {
+              return (
+                <CreateCampaignModal key={action.title}>
+                  <Button
+                    variant="outline"
+                    className="h-auto p-4 flex flex-col items-start space-y-2 hover:shadow-md transition-all duration-200 w-full"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className={`p-2 rounded-lg ${action.color}`}>
+                        <Icon className="h-4 w-4 text-white" />
+                      </div>
+                      {action.badge && (
+                        <Badge variant="secondary" className="text-xs">
+                          {action.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-left space-y-1">
+                      <h3 className="font-medium text-sm">{action.title}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {action.description}
+                      </p>
+                    </div>
+                  </Button>
+                </CreateCampaignModal>
+              )
+            }
+
             return (
               <Button
                 key={action.title}

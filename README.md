@@ -1,6 +1,8 @@
-# Meta Ads Intelligence Platform
+# 🚀 Meta Ads Intelligence Platform v2.0
 
-A comprehensive React frontend for Facebook advertising intelligence and campaign management, built with Next.js 14+ and modern web technologies.
+A comprehensive, real-time Meta/Facebook advertising intelligence platform for campaign analysis, competitor research, and automated reporting.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Raslemchr31/Stitch.git)
 
 ## 🚀 Features
 

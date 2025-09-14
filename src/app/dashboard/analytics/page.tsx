@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useMetricsUpdates } from '@/hooks/use-websocket'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -94,82 +95,132 @@ const cohortData = [
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState('7days')
   const [selectedMetric, setSelectedMetric] = useState('revenue')
+  const [liveMetrics, setLiveMetrics] = useState({
+    impressions: 123456,
+    impressionsChange: '+15%',
+    clicks: 1234,
+    clicksChange: '+10%',
+    conversions: 123,
+    conversionsChange: '-6%',
+    reach: 87654,
+    spend: 1250,
+    roas: 4.2
+  })
+
+  // Real-time metrics updates
+  const handleMetricsUpdate = useCallback((data: any) => {
+    setLiveMetrics(prev => ({
+      ...prev,
+      impressions: data.impressions,
+      clicks: data.clicks,
+      conversions: data.conversions,
+      reach: data.reach,
+      spend: data.spend,
+      roas: data.roas
+    }))
+  }, [])
+
+  useMetricsUpdates(handleMetricsUpdate)
 
   const kpis = [
     {
-      title: 'Total Revenue',
-      value: '$24,580',
-      change: '+12.5%',
-      trend: 'up',
-      icon: DollarSign,
-      description: 'vs last period'
-    },
-    {
-      title: 'Total Impressions',
-      value: '2.4M',
-      change: '+8.2%',
+      title: 'Impressions',
+      value: '12,345,678',
+      change: '+15%',
       trend: 'up',
       icon: Eye,
       description: 'vs last period'
     },
     {
-      title: 'Click-Through Rate',
-      value: '3.42%',
-      change: '-0.8%',
-      trend: 'down',
+      title: 'Reach',
+      value: '8,765,432',
+      change: '+12%',
+      trend: 'up',
+      icon: Users,
+      description: 'vs last period'
+    },
+    {
+      title: 'Clicks',
+      value: '543,210',
+      change: '+10%',
+      trend: 'up',
       icon: MousePointer,
       description: 'vs last period'
     },
     {
-      title: 'Conversion Rate',
-      value: '2.1%',
-      change: '+15.3%',
+      title: 'Conversions',
+      value: '12,345',
+      change: '+6%',
       trend: 'up',
       icon: Target,
-      description: 'vs last period'
-    },
-    {
-      title: 'Cost Per Click',
-      value: '$0.68',
-      change: '-5.2%',
-      trend: 'up',
-      icon: TrendingDown,
-      description: 'vs last period'
-    },
-    {
-      title: 'Return on Ad Spend',
-      value: '4.2x',
-      change: '+18.7%',
-      trend: 'up',
-      icon: TrendingUp,
       description: 'vs last period'
     },
   ]
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
+    <div className="min-h-screen bg-background">
+      {/* Live Metrics Ticker */}
+      <div className="w-full bg-black/90 text-white text-sm font-mono p-2 flex items-center justify-center gap-8 overflow-x-auto whitespace-nowrap">
+        <p className="text-gray-400">Live Campaign Metrics:</p>
+        <span className="flex items-center gap-2">
+          <span className="text-green-400">Impressions:</span>
+          {liveMetrics.impressions.toLocaleString()}
+          <span className="text-green-500 text-xs">▲</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-blue-400">Reach:</span>
+          {liveMetrics.reach.toLocaleString()}
+          <span className="text-green-500 text-xs">▲</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-yellow-400">Clicks:</span>
+          {liveMetrics.clicks.toLocaleString()}
+          <span className="text-green-500 text-xs">▲</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-purple-400">Conversions:</span>
+          {liveMetrics.conversions.toLocaleString()}
+          <span className="text-red-500 text-xs">▼</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-orange-400">Spend:</span>
+          ${liveMetrics.spend.toLocaleString()}
+          <span className="text-green-500 text-xs">▲</span>
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-cyan-400">ROAS:</span>
+          {liveMetrics.roas.toFixed(1)}x
+          <span className="text-green-500 text-xs">▲</span>
+        </span>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Analytics & Reports</h1>
+          <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
           <p className="text-muted-foreground">
-            Comprehensive insights into your campaign performance
+            Analyze your campaign performance with detailed metrics and visualizations.
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-40">
-              <Calendar className="h-4 w-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7days">Last 7 days</SelectItem>
-              <SelectItem value="30days">Last 30 days</SelectItem>
-              <SelectItem value="90days">Last 90 days</SelectItem>
-              <SelectItem value="1year">Last year</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center space-x-2 text-sm">
+            <Input
+              type="date"
+              defaultValue="2024-01-01"
+              className="w-36"
+            />
+            <span className="text-muted-foreground">to</span>
+            <Input
+              type="date"
+              defaultValue="2024-01-28"
+              className="w-36"
+            />
+            <Button variant="outline" size="sm" className="ml-2">
+              Compare
+            </Button>
+          </div>
 
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
@@ -189,7 +240,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi, index) => {
           const Icon = kpi.icon
           return (

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ConnectionStatus } from '@/components/ui/connection-status'
 import {
   BarChart3,
   Users,
@@ -246,6 +247,14 @@ export function Sidebar({ open, collapsed, onOpenChange, onCollapsedChange }: Si
 
           {/* Bottom navigation */}
           <div className="px-2 py-4 border-t space-y-1">
+            {/* Connection Status */}
+            {!collapsed && (
+              <div className="flex items-center justify-between px-2 py-2">
+                <span className="text-xs text-muted-foreground">Status</span>
+                <ConnectionStatus />
+              </div>
+            )}
+
             {bottomNavigation.map((item) => (
               <Link
                 key={item.name}

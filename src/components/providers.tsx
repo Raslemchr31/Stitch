@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useState, useEffect } from 'react'
 import { ErrorBoundary } from './error-boundary'
 import { Toaster } from 'sonner'
+import RealTimeProvider from './real-time-provider'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -84,11 +85,13 @@ export function Providers({ children, session }: ProvidersProps) {
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-            <Toaster position="top-right" richColors closeButton />
-            {process.env.NODE_ENV === 'development' && (
-              <ReactQueryDevtools initialIsOpen={false} />
-            )}
+            <RealTimeProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+              {process.env.NODE_ENV === 'development' && (
+                <ReactQueryDevtools initialIsOpen={false} />
+              )}
+            </RealTimeProvider>
           </ThemeProvider>
         </ErrorBoundary>
       </QueryClientProvider>

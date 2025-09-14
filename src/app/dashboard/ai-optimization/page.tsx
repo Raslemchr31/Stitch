@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useAIInsights } from '@/hooks/use-websocket'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -64,7 +65,8 @@ import {
   Lightbulb,
   Rocket,
   Shield,
-  Cpu
+  Cpu,
+  Plus
 } from 'lucide-react'
 
 interface AIInsight {
@@ -225,7 +227,7 @@ const getInsightColor = (type: AIInsight['type']) => {
 }
 
 export default function AIOptimizationPage() {
-  const [insights] = useState<AIInsight[]>(SAMPLE_INSIGHTS)
+  const [insights, setInsights] = useState<AIInsight[]>(SAMPLE_INSIGHTS)
   const [automationRules] = useState<AutomationRule[]>(AUTOMATION_RULES)
   const [selectedInsight, setSelectedInsight] = useState<AIInsight | null>(null)
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false)
@@ -233,6 +235,34 @@ export default function AIOptimizationPage() {
     { role: 'assistant', content: 'Hello! I\'m your AI optimization assistant. I can help you understand insights, create automation rules, or answer questions about your campaign performance. How can I help you today?' }
   ])
   const [newMessage, setNewMessage] = useState('')
+
+  // Real-time AI insights
+  const handleAIInsight = useCallback((data: any) => {
+    const newInsight: AIInsight = {
+      id: `insight_${Date.now()}`,
+      type: data.type,
+      title: data.message,
+      description: data.message,
+      priority: data.type === 'alert' ? 'high' : 'medium',
+      impact: 'medium',
+      confidence: Math.random() * 30 + 70,
+      estimatedImpact: `${Math.floor(Math.random() * 20) + 5}%`,
+      category: data.type === 'optimization' ? 'bidding' : data.type === 'alert' ? 'budget' : 'targeting',
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0],
+      data: data.data || {}
+    }
+
+    setInsights(prev => [newInsight, ...prev])
+
+    // Show as chat message too
+    setChatMessages(prev => [...prev, {
+      role: 'assistant',
+      content: `🤖 New ${data.type}: ${data.message}`
+    }])
+  }, [])
+
+  useAIInsights(handleAIInsight)
 
   const implementInsight = (insightId: string) => {
     // Implementation logic would go here

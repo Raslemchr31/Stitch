@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
 import {
   Target,
   Users,
@@ -22,7 +24,11 @@ import {
   Zap,
   Camera,
   Eye,
-  Play
+  Play,
+  ShoppingBag,
+  Download,
+  Store,
+  Phone
 } from 'lucide-react'
 
 const STEPS = [
@@ -35,68 +41,76 @@ const STEPS = [
 
 const OBJECTIVES = [
   {
-    id: 'awareness',
+    id: 'brand_awareness',
     title: 'Brand Awareness',
-    description: 'Increase awareness of your brand',
+    description: 'Show your ads to people who are most likely to be interested in your brand.',
     icon: Eye,
     recommended: false,
-    metrics: ['Impressions', 'Reach', 'Frequency']
+    bgImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop&crop=faces'
+  },
+  {
+    id: 'reach',
+    title: 'Reach',
+    description: 'Maximize the number of people who see your ads.',
+    icon: Users,
+    recommended: false,
+    bgImage: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=300&h=200&fit=crop'
   },
   {
     id: 'traffic',
     title: 'Traffic',
-    description: 'Drive traffic to your website',
+    description: 'Drive people to your website or app.',
     icon: Globe,
     recommended: true,
-    metrics: ['Link Clicks', 'Landing Page Views', 'CTR']
+    bgImage: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&h=200&fit=crop'
   },
   {
     id: 'engagement',
     title: 'Engagement',
-    description: 'Get more likes, comments, and shares',
+    description: 'Get more people to interact with your posts or Page.',
     icon: MessageCircle,
     recommended: false,
-    metrics: ['Post Engagement', 'Page Likes', 'Comments']
+    bgImage: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&h=200&fit=crop'
   },
   {
     id: 'app_installs',
     title: 'App Installs',
-    description: 'Get people to install your app',
-    icon: Play,
+    description: 'Get more people to install your app.',
+    icon: Phone,
     recommended: false,
-    metrics: ['App Installs', 'App Events', 'Cost Per Install']
+    bgImage: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&h=200&fit=crop'
   },
   {
     id: 'video_views',
     title: 'Video Views',
-    description: 'Get more people to watch your videos',
+    description: 'Get more people to watch your videos.',
     icon: Video,
     recommended: false,
-    metrics: ['Video Views', 'Video Completion Rate', 'Video Engagement']
+    bgImage: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=300&h=200&fit=crop'
   },
   {
     id: 'lead_generation',
     title: 'Lead Generation',
-    description: 'Collect leads for your business',
-    icon: Users,
+    description: 'Collect leads from people interested in your business.',
+    icon: Download,
     recommended: true,
-    metrics: ['Leads', 'Cost Per Lead', 'Lead Quality Score']
+    bgImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop'
   },
   {
-    id: 'conversions',
-    title: 'Conversions',
-    description: 'Drive valuable actions on your website',
-    icon: Target,
+    id: 'sales',
+    title: 'Sales',
+    description: 'Find people likely to purchase your products or services.',
+    icon: ShoppingBag,
     recommended: true,
-    metrics: ['Conversions', 'Conversion Rate', 'ROAS']
+    bgImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=200&fit=crop'
   },
   {
-    id: 'catalog_sales',
-    title: 'Catalog Sales',
-    description: 'Promote products from your catalog',
-    icon: TrendingUp,
+    id: 'store_traffic',
+    title: 'Store Traffic',
+    description: 'Drive foot traffic to your physical stores.',
+    icon: Store,
     recommended: false,
-    metrics: ['Purchases', 'Revenue', 'ROAS']
+    bgImage: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=200&fit=crop'
   }
 ]
 
@@ -128,6 +142,15 @@ export default function CampaignWizardPage() {
     setFormData({ ...formData, objective: objectiveId })
   }
 
+  const handleSaveTemplate = () => {
+    toast.success('Campaign template saved successfully!')
+  }
+
+  const handleLaunchCampaign = () => {
+    toast.success('Campaign launched successfully!')
+    // Here you would typically redirect to campaign dashboard or show success message
+  }
+
   const renderStepContent = () => {
     switch (STEPS[currentStep].id) {
       case 'objective':
@@ -140,7 +163,7 @@ export default function CampaignWizardPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {OBJECTIVES.map((objective) => {
                 const Icon = objective.icon
                 const isSelected = formData.objective === objective.id
@@ -148,51 +171,48 @@ export default function CampaignWizardPage() {
                 return (
                   <Card
                     key={objective.id}
-                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                    className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
                       isSelected
-                        ? 'ring-2 ring-primary bg-primary/5 border-primary'
+                        ? 'ring-2 ring-primary shadow-lg scale-105 border-primary bg-primary/5'
                         : 'hover:border-primary/50'
                     }`}
                     onClick={() => handleObjectiveSelect(objective.id)}
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${
-                            isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                          }`}>
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <h3 className="font-semibold">{objective.title}</h3>
-                              {objective.recommended && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Star className="h-3 w-3 mr-1" />
-                                  Recommended
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {objective.description}
-                            </p>
-                          </div>
+                    {/* Background Image */}
+                    <div
+                      className="h-40 w-full bg-cover bg-center relative"
+                      style={{ backgroundImage: `url(${objective.bgImage})` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+                      {isSelected && (
+                        <div className="absolute top-4 right-4 bg-primary rounded-full p-1">
+                          <CheckCircle2 className="h-4 w-4 text-primary-foreground" />
                         </div>
-                        {isSelected && (
-                          <CheckCircle2 className="h-5 w-5 text-primary" />
-                        )}
-                      </div>
+                      )}
+                      {objective.recommended && (
+                        <div className="absolute top-4 left-4">
+                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
+                            <Star className="h-3 w-3 mr-1" />
+                            Recommended
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
 
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          Key Metrics
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {objective.metrics.map((metric) => (
-                            <Badge key={metric} variant="outline" className="text-xs">
-                              {metric}
-                            </Badge>
-                          ))}
+                    <CardContent className="p-5 bg-card">
+                      <div className="flex items-start space-x-3">
+                        <div className={`p-2 rounded-lg transition-colors ${
+                          isSelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted group-hover:bg-primary group-hover:text-primary-foreground'
+                        }`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-lg mb-1">{objective.title}</h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {objective.description}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -562,9 +582,9 @@ export default function CampaignWizardPage() {
       </div>
 
       {/* Navigation Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <Button
               variant="outline"
               onClick={handleBack}
@@ -574,13 +594,35 @@ export default function CampaignWizardPage() {
               Back
             </Button>
 
-            <Button
-              onClick={handleNext}
-              disabled={currentStep === STEPS.length - 1}
-            >
-              Next
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={handleSaveTemplate}
+                className="hidden sm:flex"
+              >
+                Save as Template
+              </Button>
+
+              {currentStep === STEPS.length - 1 ? (
+                <Button
+                  onClick={handleLaunchCampaign}
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Launch Campaign
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={!formData.objective && currentStep === 0}
+                  size="lg"
+                >
+                  Continue
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

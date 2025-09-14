@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { useTaskUpdates, useWebSocket } from '@/hooks/use-websocket'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -66,36 +67,53 @@ const INITIAL_COLUMNS: Column[] = [
     tasks: [
       {
         id: '1',
-        title: 'Design new landing page',
-        description: 'Create wireframes and mockups for the new product landing page',
+        title: 'Design new ad creatives',
+        description: 'Create new visual assets for summer sale campaign',
         priority: 'high',
         status: 'todo',
         assignee: {
           id: '1',
           name: 'Sarah Chen',
-          avatar: '',
+          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b89c8bce?w=150&h=150&fit=crop&crop=face',
           initials: 'SC'
         },
-        labels: ['Design', 'Landing Page'],
+        labels: ['Design'],
         dueDate: '2024-01-25',
-        comments: 3,
-        attachments: 2
+        comments: 0,
+        attachments: 0
       },
       {
         id: '2',
-        title: 'Set up analytics tracking',
-        description: 'Implement Google Analytics and Facebook Pixel on all campaign pages',
+        title: 'Write copy for social media posts',
+        description: 'Create engaging copy for all social media platforms',
         priority: 'medium',
         status: 'todo',
         assignee: {
           id: '2',
           name: 'Mike Johnson',
-          avatar: '',
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
           initials: 'MJ'
         },
-        labels: ['Analytics', 'Tracking'],
+        labels: ['Copywriting'],
         dueDate: '2024-01-30',
-        comments: 1,
+        comments: 0,
+        attachments: 0
+      },
+      {
+        id: '3',
+        title: 'Setup new A/B test',
+        description: 'Configure A/B testing for campaign variants',
+        priority: 'medium',
+        status: 'todo',
+        assignee: {
+          id: '3',
+          name: 'Alex Thompson',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+          initials: 'AT'
+        },
+        labels: ['Marketing'],
+        dueDate: '2024-02-01',
+        comments: 0,
         attachments: 0
       }
     ]
@@ -107,64 +125,62 @@ const INITIAL_COLUMNS: Column[] = [
     limit: 3,
     tasks: [
       {
-        id: '3',
-        title: 'Develop campaign dashboard',
-        description: 'Build React components for the campaign management interface',
-        priority: 'high',
-        status: 'in_progress',
-        assignee: {
-          id: '3',
-          name: 'Alex Thompson',
-          avatar: '',
-          initials: 'AT'
-        },
-        labels: ['Frontend', 'Dashboard'],
-        dueDate: '2024-01-28',
-        comments: 7,
-        attachments: 1,
-        progress: 65
-      },
-      {
         id: '4',
-        title: 'Content creation workflow',
-        description: 'Define process for creating and approving ad creatives',
-        priority: 'medium',
+        title: 'Develop landing page',
+        description: 'Build responsive landing page for summer sale',
+        priority: 'high',
         status: 'in_progress',
         assignee: {
           id: '4',
           name: 'Emma Davis',
-          avatar: '',
+          avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
           initials: 'ED'
         },
-        labels: ['Content', 'Workflow'],
-        dueDate: '2024-02-01',
-        comments: 2,
-        attachments: 3,
-        progress: 30
+        labels: ['Development'],
+        dueDate: '2024-01-28',
+        comments: 0,
+        attachments: 0
+      },
+      {
+        id: '5',
+        title: 'Review campaign budget',
+        description: 'Analyze and optimize campaign spending allocation',
+        priority: 'medium',
+        status: 'in_progress',
+        assignee: {
+          id: '5',
+          name: 'David Wilson',
+          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+          initials: 'DW'
+        },
+        labels: ['Marketing'],
+        dueDate: '2024-02-02',
+        comments: 0,
+        attachments: 0
       }
     ]
   },
   {
     id: 'review',
-    title: 'Review',
+    title: 'In Review',
     color: 'bg-yellow-50 dark:bg-yellow-900/20',
     tasks: [
       {
-        id: '5',
-        title: 'API documentation update',
-        description: 'Update API docs with new Meta Graph API endpoints',
-        priority: 'low',
+        id: '6',
+        title: 'Finalize ad targeting',
+        description: 'Review and approve final audience targeting parameters',
+        priority: 'high',
         status: 'review',
         assignee: {
-          id: '5',
-          name: 'David Wilson',
-          avatar: '',
-          initials: 'DW'
+          id: '6',
+          name: 'Lisa Wang',
+          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+          initials: 'LW'
         },
-        labels: ['Documentation', 'API'],
+        labels: ['Pending Approval'],
         dueDate: '2024-01-26',
-        comments: 4,
-        attachments: 1
+        comments: 0,
+        attachments: 0
       }
     ]
   },
@@ -174,37 +190,20 @@ const INITIAL_COLUMNS: Column[] = [
     color: 'bg-green-50 dark:bg-green-900/20',
     tasks: [
       {
-        id: '6',
-        title: 'Database schema design',
-        description: 'Design and implement database schema for campaign data',
-        priority: 'high',
-        status: 'done',
-        assignee: {
-          id: '6',
-          name: 'Lisa Wang',
-          avatar: '',
-          initials: 'LW'
-        },
-        labels: ['Backend', 'Database'],
-        dueDate: '2024-01-20',
-        comments: 8,
-        attachments: 2
-      },
-      {
         id: '7',
-        title: 'User authentication setup',
-        description: 'Implement NextAuth.js with Meta OAuth integration',
-        priority: 'urgent',
+        title: 'Launch social media campaign',
+        description: 'Successfully launched social media promotion campaign',
+        priority: 'high',
         status: 'done',
         assignee: {
           id: '7',
           name: 'Ryan Miller',
-          avatar: '',
+          avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face',
           initials: 'RM'
         },
-        labels: ['Auth', 'Security'],
-        dueDate: '2024-01-18',
-        comments: 5,
+        labels: ['Completed'],
+        dueDate: '2024-01-20',
+        comments: 0,
         attachments: 0
       }
     ]
@@ -229,6 +228,21 @@ export default function TeamBoardPage() {
   const [columns, setColumns] = useState<Column[]>(INITIAL_COLUMNS)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
+  const { emit } = useWebSocket()
+
+  // Real-time task updates
+  const handleTaskUpdate = useCallback((data: any) => {
+    setColumns(prev => prev.map(column => ({
+      ...column,
+      tasks: column.tasks.map(task =>
+        task.id === data.id
+          ? { ...task, status: data.status, ...data }
+          : task
+      )
+    })))
+  }, [])
+
+  useTaskUpdates(handleTaskUpdate)
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return
@@ -248,6 +262,12 @@ export default function TeamBoardPage() {
     destColumn.tasks.splice(destination.index, 0, movedTask)
 
     setColumns(newColumns)
+
+    // Emit real-time update
+    emit('task-drag', {
+      taskId: movedTask.id,
+      columnId: destination.droppableId
+    })
   }
 
   const getPriorityIcon = (priority: Task['priority']) => {
@@ -280,9 +300,9 @@ export default function TeamBoardPage() {
       <div className="border-b bg-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold">Team Collaboration Board</h1>
+            <h1 className="text-3xl font-bold">Summer Sale Campaign</h1>
             <p className="text-muted-foreground">
-              Manage your team's tasks and track campaign progress
+              Manage your campaign progress and collaborate with your team
             </p>
           </div>
 
@@ -290,6 +310,10 @@ export default function TeamBoardPage() {
             <Button variant="outline" size="sm">
               <Filter className="h-4 w-4 mr-2" />
               Filter
+            </Button>
+            <Button variant="outline" size="sm">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Start Call
             </Button>
             <Dialog>
               <DialogTrigger asChild>
@@ -334,6 +358,21 @@ export default function TeamBoardPage() {
               </DialogContent>
             </Dialog>
           </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="border-b border-border mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button className="border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+              Board
+            </button>
+            <button className="border-transparent text-muted-foreground hover:text-foreground hover:border-border whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              List
+            </button>
+            <button className="border-transparent text-muted-foreground hover:text-foreground hover:border-border whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+              Calendar
+            </button>
+          </nav>
         </div>
 
         <div className="flex items-center space-x-4">

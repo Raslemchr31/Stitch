@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useCreativeUpdates, useWebSocket } from '@/hooks/use-websocket'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -91,7 +92,7 @@ const SAMPLE_CREATIVES: Creative[] = [
       conversions: 127,
       roas: 4.2
     },
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1607083206325-cad6b0710adb?w=400&h=300&fit=crop',
     createdAt: '2024-01-15',
     updatedAt: '2024-01-20',
     tags: ['summer', 'sale', 'banner', 'hero'],
@@ -115,7 +116,7 @@ const SAMPLE_CREATIVES: Creative[] = [
       conversions: 156,
       roas: 5.8
     },
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=300&fit=crop',
     createdAt: '2024-01-18',
     updatedAt: '2024-01-22',
     tags: ['product', 'demo', 'video', 'tutorial'],
@@ -139,7 +140,7 @@ const SAMPLE_CREATIVES: Creative[] = [
       conversions: 289,
       roas: 3.9
     },
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop',
     createdAt: '2024-01-10',
     updatedAt: '2024-01-25',
     tags: ['holiday', 'collection', 'carousel', 'products'],
@@ -163,7 +164,7 @@ const SAMPLE_CREATIVES: Creative[] = [
       conversions: 0,
       roas: 0
     },
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?w=400&h=300&fit=crop',
     createdAt: '2024-01-25',
     updatedAt: '2024-01-25',
     tags: ['brand', 'story', 'text', 'awareness'],
@@ -202,6 +203,22 @@ export default function CreativeHubPage() {
   const [filterType, setFilterType] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const { emit } = useWebSocket()
+
+  // Real-time creative performance updates
+  const handleCreativeUpdate = useCallback((data: any) => {
+    setCreatives(prev => prev.map(creative =>
+      creative.id === data.id
+        ? { ...creative, performance: { ...creative.performance, ...data.performance }, ...data }
+        : creative
+    ))
+  }, [])
+
+  useCreativeUpdates(handleCreativeUpdate)
+
+  const handleCreativeLike = (creativeId: string) => {
+    emit('creative-like', creativeId)
+  }
 
   const filteredCreatives = creatives.filter(creative => {
     const matchesSearch = creative.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -425,9 +442,17 @@ export default function CreativeHubPage() {
                     <CardContent className="p-0">
                       {/* Thumbnail */}
                       <div className="relative aspect-video bg-muted rounded-t-lg overflow-hidden">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <TypeIcon className="h-12 w-12 text-muted-foreground" />
-                        </div>
+                        {creative.thumbnail ? (
+                          <img
+                            src={creative.thumbnail}
+                            alt={creative.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <TypeIcon className="h-12 w-12 text-muted-foreground" />
+                          </div>
+                        )}
 
                         {/* Overlay Controls */}
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
@@ -652,11 +677,19 @@ export default function CreativeHubPage() {
             {/* Preview */}
             <div>
               <h3 className="font-medium mb-3">Preview</h3>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                {(() => {
-                  const Icon = getTypeIcon(selectedCreative.type)
-                  return <Icon className="h-12 w-12 text-muted-foreground" />
-                })()}
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                {selectedCreative.thumbnail ? (
+                  <img
+                    src={selectedCreative.thumbnail}
+                    alt={selectedCreative.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  (() => {
+                    const Icon = getTypeIcon(selectedCreative.type)
+                    return <Icon className="h-12 w-12 text-muted-foreground" />
+                  })()
+                )}
               </div>
             </div>
 
